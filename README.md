@@ -14,6 +14,23 @@ The utility can be used to generate a task definition or to run a task or servic
 --cluster - the ECS cluster to run the task or service (default = cluster)
 ```
 
+### logging
+
+The utility can send container logs to Cloudwatch, recommended if using AWS Fargate. Initialise a Log Group with the AWS CLI:
+
+```
+aws logs create-log-group --log-group-name {awslogs-group-name} --region {aws-region}
+```
+
+options:
+```
+--awslogs-group - The name of the log group
+--awslogs-region - The AWS region of the log group
+--awslogs-stream-prefix - Prepends to log stream entries. (default = Container name as specified below)
+```
+
+### docker
+
 All the following Docker run command line options of Docker 1.7 are supported.
 
 ```

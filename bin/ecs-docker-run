@@ -37,6 +37,10 @@ CPU_SHARES=100
 TASK_DEF=
 TASK_ARN=
 RUN_AS_SERVICE=0
+AWSLOGS_REGION=
+AWSLOGS_GROUP=
+AWSLOGS_STREAM_PREFIX=
+
 
 function ignore() {
 	echo "WARN: command line option $1 recoqnized but ignored " >&2
@@ -56,6 +60,9 @@ function parseDockerRunCmd() {
 		--number-of-instances) shift ; NUMBER_OF_INSTANCES="$1"; shift;;
 		--cluster) shift; CLUSTER="$1"; shift;;
 		--run-as-service) RUN_AS_SERVICE=1; shift;;
+		--awslogs-region) shift; AWSLOGS_REGION="$1"; shift;;
+		--awslogs-group) shift; AWSLOGS_GROUP="$1"; shift;;
+		--awslogs-stream-prefix) shift; AWSLOGS_STREAM_PREFIX="$1"; shift;;
 		-t) ignore "$1"; shift;;
 		-it) ignore "$1"; shift;;
 		-ti) ignore "$1"; shift;;
@@ -305,6 +312,12 @@ function generateMountPointsDef() {
 function generateImageDef() {
 	if [ -n "$ENTRYPOINT" ] ; then
 		echo \"entrypoint\": [ \"$ENTRYPOINT\" ],
+	fi
+	if [ -z "$AWSLOGS_STREAM_PREFIX" ] ; then
+		AWSLOGS_STREAM_PREFIX="$NAME"
+	fi
+	if [ -n "$AWSLOGS_REGION" -a -n "$AWSLOGS_GROUP" ] ; then
+		echo \"logConfiguration\": \{ \"logDriver\": \"awslogs\", \"options\": \{\"awslogs-region\": \"$AWSLOGS_REGION\", \"awslogs-group\": \"$AWSLOGS_GROUP\", \"awslogs-stream-prefix\": \"$AWSLOGS_STREAM_PREFIX\" \} \},
 	fi
         echo \"essential\": true,
 	echo \"memory\": $MEMORY,
